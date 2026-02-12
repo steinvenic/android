@@ -45,6 +45,15 @@ internal class Settings(context: Context) {
     var clientCertPassword: String?
         get() = sharedPreferences.getString("clientCertPass", null)
         set(value) = sharedPreferences.edit { putString("clientCertPass", value) }
+    
+    // SMS Forwarding uses default SharedPreferences (same as PreferenceScreen)
+    private val defaultPreferences by lazy {
+        androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+    }
+    
+    var smsForwarding: Boolean
+        get() = defaultPreferences.getBoolean("sms_forwarding", false)
+        set(value) = defaultPreferences.edit { putBoolean("sms_forwarding", value) }
 
     init {
         sharedPreferences = context.getSharedPreferences("gotify", Context.MODE_PRIVATE)

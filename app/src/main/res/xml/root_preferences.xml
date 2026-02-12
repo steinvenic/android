@@ -51,4 +51,12 @@
             android:summary="@string/setting_summary_prompt_onreceive_intent" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/setting_sms_forwarding">
+        <SwitchPreferenceCompat
+            android:key="@string/setting_key_sms_forwarding"
+            android:title="@string/setting_sms_forwarding"
+            android:summary="@string/setting_summary_sms_forwarding"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

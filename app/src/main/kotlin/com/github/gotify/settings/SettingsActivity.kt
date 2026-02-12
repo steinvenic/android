@@ -74,6 +74,60 @@ internal class SettingsActivity :
                     getString(R.string.setting_key_notification_channels)
                 )?.isEnabled = true
             }
+            
+            // Handle SMS forwarding permission
+            findPreference<SwitchPreferenceCompat>(
+                getString(R.string.setting_key_sms_forwarding)
+            )?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue as Boolean) {
+                    requestSmsPermissions()
+                    false // Don't update yet, will update after permission granted
+                } else {
+                    true // Allow disabling without permission check
+                }
+            }
+        }
+        
+        private fun requestSmsPermissions() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val permissions = arrayOf(
+                    android.Manifest.permission.RECEIVE_SMS,
+                    android.Manifest.permission.READ_SMS
+                )
+                requestPermissions(permissions, SMS_PERMISSION_REQUEST_CODE)
+            }
+        }
+        
+        override fun onRequestPermissionsResult(
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
+        ) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
+                if (grantResults.all { it == android.content.pm.PackageManager.PERMISSION_GRANTED }) {
+                    // Permission granted, enable the setting
+                    findPreference<SwitchPreferenceCompat>(
+                        getString(R.string.setting_key_sms_forwarding)
+                    )?.isChecked = true
+                    
+                    com.google.android.material.snackbar.Snackbar.make(
+                        requireView(),
+                        "SMS permissions granted. SMS forwarding enabled.",
+                        com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    com.google.android.material.snackbar.Snackbar.make(
+                        requireView(),
+                        "SMS permissions denied. SMS forwarding cannot be enabled.",
+                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+        
+        companion object {
+            private const val SMS_PERMISSION_REQUEST_CODE = 100
         }
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
