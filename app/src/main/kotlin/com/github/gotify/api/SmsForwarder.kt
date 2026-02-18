@@ -26,7 +26,7 @@ internal class SmsForwarder(private val settings: Settings) {
             CertUtils.applySslSettings(clientApiClient.okBuilder, settings.sslSettings())
 
             val appApi = clientApiClient.createService(ApplicationApi::class.java)
-            
+
             Logger.info("SmsForwarder: Fetching applications")
             val appsResponse = appApi.apps.execute()
             if (!appsResponse.isSuccessful) {
@@ -42,15 +42,17 @@ internal class SmsForwarder(private val settings: Settings) {
                 val newAppParams = ApplicationParams()
                 newAppParams.name("SMS Forwarder")
                 newAppParams.description("Auto-generated for SMS Forwarding")
-                
+
                 val createAppResponse = appApi.createApp(newAppParams).execute()
                 if (!createAppResponse.isSuccessful) {
-                    Logger.error("SmsForwarder: Failed to create app. Code: ${createAppResponse.code()}")
+                    Logger.error(
+                        "SmsForwarder: Failed to create app. Code: ${createAppResponse.code()}"
+                    )
                     return
                 }
                 appToken = createAppResponse.body()?.token
                 if (appToken != null) {
-                     Logger.info("SmsForwarder: App created successfully")
+                    Logger.info("SmsForwarder: App created successfully")
                 }
             } else {
                 Logger.info("SmsForwarder: Found existing 'SMS Forwarder' app")
@@ -73,13 +75,12 @@ internal class SmsForwarder(private val settings: Settings) {
             msg.priority = 5
 
             val response = messageApi.createMessage(msg).execute()
-            
+
             if (response.isSuccessful) {
                 Logger.info("SmsForwarder: Message sent successfully")
             } else {
                 Logger.error("SmsForwarder: Failed to send message. Code: ${response.code()}")
             }
-
         } catch (e: Exception) {
             Logger.error(e, "SmsForwarder: Error processing SMS forwarding")
         }
