@@ -102,6 +102,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.1")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("org.threeten:threetenbp:1.7.1")
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
 }
 
 configurations {
