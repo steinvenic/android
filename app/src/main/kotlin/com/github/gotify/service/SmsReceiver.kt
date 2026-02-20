@@ -8,6 +8,7 @@ import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import com.github.gotify.Settings
 import java.util.regex.Pattern
@@ -76,6 +77,7 @@ class SmsReceiver : BroadcastReceiver() {
                 val workRequest = OneTimeWorkRequestBuilder<SmsForwardWorker>()
                     .setInputData(data)
                     .setConstraints(constraints)
+                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                     .build()
 
                 WorkManager.getInstance(context).enqueue(workRequest)

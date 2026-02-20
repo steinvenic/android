@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.ByteArrayOutputStream
 
 plugins {
     id("com.android.application")
@@ -15,8 +16,22 @@ android {
         applicationId = "com.github.gotify"
         minSdk = 23
         targetSdk = 36
-        versionCode = 34
-        versionName = "2.9.0"
+        
+        val gitVersion = try {
+            val stdout = ByteArrayOutputStream()
+            project.exec {
+                commandLine("git", "describe", "--tags", "--abbrev=0")
+                standardOutput = stdout
+                isIgnoreExitValue = true
+            }
+            stdout.toString().trim().removePrefix("v").ifEmpty { "2.9.0" }
+        } catch (e: Exception) {
+            "2.9.0"
+        }
+
+        versionCode = System.getenv("VERSION_CODE")?.toInt() ?: 34
+        versionName = System.getenv("VERSION_NAME") ?: gitVersion
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig = signingConfigs.getByName("debug")
